@@ -1,0 +1,20 @@
+{
+    "name": "user/mail-kit",
+    "description": "Custom email sending plugin",
+    "type": "wordpress-plugin",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "ahnabshahin",
+            "email": "shahinahnab@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "MailKit\\": "includes/"
+        },
+        "files": []
+    }
+}
