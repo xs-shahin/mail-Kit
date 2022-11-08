@@ -16,13 +16,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 /**
  * The Main Plugin Class
  */
 final class Mail_Kit
 {
     const version = '1.0';
-
 
     /**
      * Class contructor
@@ -33,8 +34,20 @@ final class Mail_Kit
     {
         $this->define_constants();
         register_activation_hook(__FILE__, [$this, 'activate']);
+        add_action('plugins_loaded', [$this, 'init_plugin']);
     }
 
+
+    public static function write_log($log)
+    {
+        if (true === WP_DEBUG) {
+            if (is_array($log) || is_object($log)) {
+                error_log(print_r($log, true));
+            } else {
+                error_log($log);
+            }
+        }
+    }
     /**
      * Initializes Singleton Instance
      * 
@@ -58,19 +71,44 @@ final class Mail_Kit
      */
     public function define_constants()
     {
-        defined('MK_VERSION', self::version);
-        defined('MK_FILE', __FILE__);
-        defined('MK_PATH', __DIR__);
-        defined('MK_URL', plugins_url('', MK_FILE));
-        defined('MK_ASSETS', MK_URL . '/assets');
+        define('MK_VERSION', self::version);
+        define('MK_FILE', __FILE__);
+        define('MK_PATH', __DIR__);
+        define('MK_URL', plugins_url('', MK_FILE));
+        define('MK_ASSETS', MK_URL . '/assets');
     }
+
+    /**
+     * initialize the plugin.
+     * 
+     * @return void
+     */
+    public function init_plugin()
+    {
+        new \MailKit\Email\SMTP();
+        new \MailKit\Email\UserRegistration();
+        if (is_Admin()) {
+            new \MailKit\Admin();
+        }
+    }
+    /**
+     * Do stuff upon plugin activation
+     */
     public function activate()
     {
+        /**
+         * Save plugin installation time.
+         */
         $installed = get_option('mk_installed');
         if (!$installed) {
             update_option('mk_installed', time());
         }
 
+        /**
+         * Update plugin version.
+         * 
+         * @param string $option
+         */
         update_option('mk_version', MK_VERSION);
     }
 }
