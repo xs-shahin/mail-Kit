@@ -21,10 +21,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 /**
  * The Main Plugin Class
  */
-final class Mail_Kit
+final class MailKit
 {
-    const version = '1.0';
-
     /**
      * Class contructor
      * 
@@ -32,26 +30,15 @@ final class Mail_Kit
      */
     private function __construct()
     {
-        $this->define_constants();
+        $this->defineConstants();
         register_activation_hook(__FILE__, [$this, 'activate']);
-        add_action('plugins_loaded', [$this, 'init_plugin']);
+        add_action('plugins_loaded', [$this, 'initPlugin']);
     }
 
-
-    public static function write_log($log)
-    {
-        if (true === WP_DEBUG) {
-            if (is_array($log) || is_object($log)) {
-                error_log(print_r($log, true));
-            } else {
-                error_log($log);
-            }
-        }
-    }
     /**
      * Initializes Singleton Instance
      * 
-     * @return \Mail_Kit
+     * @return \MailKit
      */
     public static function init()
     {
@@ -69,9 +56,9 @@ final class Mail_Kit
      * 
      * @return void
      */
-    public function define_constants()
+    public function defineConstants()
     {
-        define('MK_VERSION', self::version);
+        define('MK_VERSION', '1.0');
         define('MK_FILE', __FILE__);
         define('MK_PATH', __DIR__);
         define('MK_URL', plugins_url('', MK_FILE));
@@ -83,14 +70,15 @@ final class Mail_Kit
      * 
      * @return void
      */
-    public function init_plugin()
+    public function initPlugin()
     {
-        new \MailKit\Email\SMTP();
-        new \MailKit\Email\UserRegistration();
+        new \MailKit\Email();
         if (is_Admin()) {
             new \MailKit\Admin();
         }
     }
+
+
     /**
      * Do stuff upon plugin activation
      */
@@ -99,6 +87,7 @@ final class Mail_Kit
         /**
          * Save plugin installation time.
          */
+
         $installed = get_option('mk_installed');
         if (!$installed) {
             update_option('mk_installed', time());
@@ -116,14 +105,14 @@ final class Mail_Kit
 /**
  * Initializes the main plugin
  * 
- * @return \Mail_Kit
+ * @return \MailKit
  */
-function mail_kit()
+function mailKit()
 {
-    return Mail_Kit::init();
+    return MailKit::init();
 }
 
 /**
  * Kick off the plugin
  */
-mail_kit();
+mailKit();
